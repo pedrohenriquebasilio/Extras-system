@@ -51,7 +51,6 @@ public class Extraservices {
         Extra salvo = repository.save(extra);
 
         return new ExtraResponseDTO(
-                salvo.getId(),
                 salvo.getName(),
                 salvo.getCpf(),
                 salvo.getRg(),
