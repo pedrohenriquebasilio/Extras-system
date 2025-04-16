@@ -1,9 +1,11 @@
 package com.ourominas.freelancers.controllers.extracontroller;
 
 
+import com.ourominas.freelancers.domain.Extra;
 import com.ourominas.freelancers.domain.Users;
 import com.ourominas.freelancers.domain.dto.request.ExtraRequestDTO;
 import com.ourominas.freelancers.domain.dto.request.UserRequestDTO;
+import com.ourominas.freelancers.domain.dto.response.ExtraResponseDTO;
 import com.ourominas.freelancers.domain.dto.response.UserResponseDTO;
 import com.ourominas.freelancers.services.extraservices.Extraservices;
 import com.ourominas.freelancers.services.userservices.UserService;
@@ -23,30 +25,37 @@ public class ExtraController {
     private Extraservices extraservices;
 
     @GetMapping("/lista-extras")
-    public List<Users> getAlluser(){
+    public List<Extra> getAlluser(){
         return extraservices.getAllUsers();
     }
+
     @PostMapping("/cadastra-extras")
     public void addUser(@RequestBody ExtraRequestDTO ExtraRequestDTO){
-        Users users = new Users();
-        users.setName(ExtraRequestDTO.name());
-        users.setEmail(ExtraRequestDTO.email());
-        users.setRole(ExtraRequestDTO.role());
-        users.setDepartment(ExtraRequestDTO.department());
-        users.setPassword(ExtraRequestDTO.password());
-        extraservices.addExtra(ExtraRequestDTO);
+        Extra extra = new Extra();
+        extra.setName(ExtraRequestDTO.name());
+        extra.setRg(ExtraRequestDTO.rg());
+        extra.setCpf(ExtraRequestDTO.cpf());
+        extra.setEmail(ExtraRequestDTO.email());
+        extra.setPis(ExtraRequestDTO.pis());
+        extra.setSefip(ExtraRequestDTO.Sefip());
+        extra.setSindicate(ExtraRequestDTO.sindicate());
+        extra.setESocial(ExtraRequestDTO.esocial());
+        extra.setTelefone(ExtraRequestDTO.telefone());
+        extra.setDateBirth(ExtraRequestDTO.date_birth());
+        extra.setAvaliable(ExtraRequestDTO.isAvaliable());
     }
+
     @DeleteMapping("/extras/{id}")
-    public ResponseEntity<Void> deletarUsuario(@PathVariable UUID id) {
-        extraservices.deleteById(id);
+    public ResponseEntity<Void> deletarExtra(@PathVariable UUID id) {
+        extraservices.DeleteByid(id);
         return ResponseEntity.noContent().build();
     }
     @PutMapping("/atualiza-extras/{id}")
-    public ResponseEntity<UserResponseDTO> atualizarUsuario(
+    public ResponseEntity<ExtraResponseDTO> atualizarExtra(
             @PathVariable UUID id,
-            @RequestBody UserRequestDTO dto) {
+            @RequestBody ExtraRequestDTO dto) {
 
-        UserResponseDTO atualizado = extraservices.atualizarUsuario(id, dto);
+        ExtraResponseDTO atualizado = extraservices.atualizarUsuario(id, dto);
         return ResponseEntity.ok(atualizado);
     }
 }
