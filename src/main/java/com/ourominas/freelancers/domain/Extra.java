@@ -21,6 +21,10 @@ import java.util.UUID;
 @Entity
 public class Extra {
 
+    public Extra(UUID id) {
+        this.id = id;
+    }
+
     @Id
     @GeneratedValue
     private UUID id;
@@ -46,6 +50,7 @@ public class Extra {
     private String Sindicate;
 
     private boolean isAvaliable;
+
 
 
 
