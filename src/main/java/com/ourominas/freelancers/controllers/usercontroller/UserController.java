@@ -6,6 +6,7 @@ import com.ourominas.freelancers.domain.dto.request.UserRequestDTO;
 import com.ourominas.freelancers.domain.dto.response.UserResponseDTO;
 import com.ourominas.freelancers.services.userservices.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -28,14 +29,9 @@ public class UserController {
     }
 
     @PostMapping("/cadastra-user")
-    public void addUser(@RequestBody UserRequestDTO userRequestDTO){
-        Users users = new Users();
-        users.setName(userRequestDTO.name());
-        users.setEmail(userRequestDTO.email());
-        users.setRole(userRequestDTO.role());
-        users.setDepartment(userRequestDTO.department());
-        users.setPassword(userRequestDTO.password());
-        userService.addUsers(users);
+    public ResponseEntity addUser(@RequestBody UserRequestDTO userRequestDTO){
+        userService.addUsers(userRequestDTO);
+        return ResponseEntity.ok(HttpStatus.CREATED);
     }
     @DeleteMapping("/usuarios/{id}")
     public ResponseEntity<Void> deletarUsuario(@PathVariable UUID id) {

@@ -1,16 +1,16 @@
 package com.ourominas.freelancers.domain;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -31,5 +31,13 @@ public class Event {
     private String description;
 
     private Date date;
+
+    @ManyToMany
+    @JoinTable(
+            name = "event_extra",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "extra_id")
+    )
+    private Set<Extra> extras = new HashSet<>();
 
 }

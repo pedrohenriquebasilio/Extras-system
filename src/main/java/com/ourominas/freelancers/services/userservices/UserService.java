@@ -21,8 +21,23 @@ public class UserService {
         return repository.findAll();
     }
 
-    public Users addUsers(Users users){
-        return repository.save(users);
+    public UserResponseDTO addUsers(UserRequestDTO dto){
+        Users users = new Users();
+
+        users.setName(dto.name());
+        users.setEmail(dto.email());
+        users.setDepartment(dto.department());
+        users.setRole(dto.role());
+        users.setPassword(dto.password());
+
+        Users saveUser = repository.save(users);
+
+        return new UserResponseDTO(
+                saveUser.getName(),
+                saveUser.getEmail(),
+                saveUser.getDepartment(),
+                saveUser.getRole()
+        );
     }
 
     public void deleteById(UUID id) {

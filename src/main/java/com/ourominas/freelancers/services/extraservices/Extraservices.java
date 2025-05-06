@@ -22,8 +22,36 @@ public class Extraservices {
         return repository.findAll();
     }
 
-    public Extra addExtra(Extra extra){
-        return repository.save(extra);
+    public ExtraResponseDTO addExtra(ExtraRequestDTO dto){
+        Extra extra = new Extra();
+
+        extra.setName(dto.name());
+        extra.setEmail(dto.email());
+        extra.setRg(dto.rg());
+        extra.setPis(dto.pis());
+        extra.setESocial(dto.esocial());
+        extra.setSefip(dto.Sefip());
+        extra.setSindicate(dto.sindicate());
+        extra.setDateBirth(dto.date_birth());
+        extra.setTelefone(dto.telefone());
+        extra.setCpf(dto.cpf());
+
+        Extra saveExtra = repository.save(extra);
+
+        return new ExtraResponseDTO(
+                saveExtra.getName(),
+                saveExtra.getCpf(),
+                saveExtra.getRg(),
+                saveExtra.getPis(),
+                saveExtra.getDateBirth(),
+                saveExtra.getESocial(),
+                saveExtra.getEmail(),
+                saveExtra.getSefip(),
+                saveExtra.getSindicate(),
+                saveExtra.getTelefone(),
+                saveExtra.isAvailable()
+        );
+
     }
 
     public void DeleteByid(UUID id){
@@ -61,7 +89,7 @@ public class Extraservices {
                 salvo.getESocial(),
                 salvo.getSefip(),
                 salvo.getSindicate(),
-                salvo.isAvaliable()
+                salvo.isAvailable()
         );
     }
 

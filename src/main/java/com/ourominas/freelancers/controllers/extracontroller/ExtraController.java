@@ -31,18 +31,7 @@ public class ExtraController {
 
     @PostMapping("/cadastra-extras")
     public void addUser(@RequestBody ExtraRequestDTO ExtraRequestDTO){
-        Extra extra = new Extra();
-        extra.setName(ExtraRequestDTO.name());
-        extra.setRg(ExtraRequestDTO.rg());
-        extra.setCpf(ExtraRequestDTO.cpf());
-        extra.setEmail(ExtraRequestDTO.email());
-        extra.setPis(ExtraRequestDTO.pis());
-        extra.setSefip(ExtraRequestDTO.Sefip());
-        extra.setSindicate(ExtraRequestDTO.sindicate());
-        extra.setESocial(ExtraRequestDTO.esocial());
-        extra.setTelefone(ExtraRequestDTO.telefone());
-        extra.setDateBirth(ExtraRequestDTO.date_birth());
-        extra.setAvaliable(ExtraRequestDTO.isAvaliable());
+        extraservices.addExtra(ExtraRequestDTO);
     }
 
     @DeleteMapping("/extras/{id}")
