@@ -20,6 +20,10 @@ import java.util.UUID;
 @Table(name= "Users")
 public class Users {
 
+    public Users(UUID id) {
+        this.id = id;
+    }
+
     @Id
     @GeneratedValue
     private UUID id;
