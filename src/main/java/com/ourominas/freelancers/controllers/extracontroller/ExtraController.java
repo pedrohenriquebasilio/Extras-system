@@ -1,50 +1,56 @@
 package com.ourominas.freelancers.controllers.extracontroller;
 
-
-import com.ourominas.freelancers.domain.Extra;
-import com.ourominas.freelancers.domain.Users;
 import com.ourominas.freelancers.domain.dto.request.ExtraRequestDTO;
-import com.ourominas.freelancers.domain.dto.request.UserRequestDTO;
 import com.ourominas.freelancers.domain.dto.response.ExtraResponseDTO;
-import com.ourominas.freelancers.domain.dto.response.UserResponseDTO;
 import com.ourominas.freelancers.services.extraservices.Extraservices;
-import com.ourominas.freelancers.services.userservices.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@Controller
+@RequestMapping("/extras")
 public class ExtraController {
+
+    private static final Logger log = LoggerFactory.getLogger(ExtraController.class);
 
     @Autowired
     private Extraservices extraservices;
 
-    @GetMapping("/lista-extras")
-    public List<Extra> getAlluser(){
-        return extraservices.getAllUsers();
+    @GetMapping
+    public ResponseEntity<List<ExtraResponseDTO>> getAllExtras() {
+        log.info("Buscando todos os extras");
+        List<ExtraResponseDTO> extras = extraservices.getAllExtras();
+        log.info("Extras encontrados: {}", extras);
+        return ResponseEntity.ok(extras);
     }
 
-    @PostMapping("/cadastra-extras")
-    public void addUser(@RequestBody ExtraRequestDTO ExtraRequestDTO){
-        extraservices.addExtra(ExtraRequestDTO);
+    @PostMapping
+    public ResponseEntity<ExtraResponseDTO> addExtra(@RequestBody ExtraRequestDTO extraRequestDTO) {
+        log.info("Cadastrando novo extra: {}", extraRequestDTO);
+        ExtraResponseDTO createdExtra = extraservices.addExtra(extraRequestDTO);
+        return ResponseEntity.ok(createdExtra);
     }
 
-    @DeleteMapping("/extras/{id}")
-    public ResponseEntity<Void> deletarExtra(@PathVariable UUID id) {
-        extraservices.DeleteByid(id);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteExtra(@PathVariable UUID id) {
+        log.info("Deletando extra com ID: {}", id);
+        extraservices.deleteById(id);
         return ResponseEntity.noContent().build();
     }
-    @PutMapping("/atualiza-extras/{id}")
-    public ResponseEntity<ExtraResponseDTO> atualizarExtra(
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ExtraResponseDTO> updateExtra(
             @PathVariable UUID id,
             @RequestBody ExtraRequestDTO dto) {
-
-        ExtraResponseDTO atualizado = extraservices.atualizarUsuario(id, dto);
-        return ResponseEntity.ok(atualizado);
+        log.info("Atualizando extra com ID: {}, dados: {}", id, dto);
+        ExtraResponseDTO updatedExtra = extraservices.atualizarUsuario(id, dto);
+        return ResponseEntity.ok(updatedExtra);
     }
 }

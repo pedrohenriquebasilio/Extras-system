@@ -8,19 +8,39 @@ import com.ourominas.freelancers.domain.dto.request.UserRequestDTO;
 import com.ourominas.freelancers.domain.dto.response.ExtraResponseDTO;
 import com.ourominas.freelancers.domain.dto.response.UserResponseDTO;
 import com.ourominas.freelancers.repositories.ExtraRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class Extraservices {
 
+    @Autowired
     private ExtraRepository repository;
 
-    public List<Extra> getAllUsers(){
-        return repository.findAll();
+    public List<ExtraResponseDTO> getAllExtras() {
+        return repository.findAll()
+                .stream()
+                .map(extra -> new ExtraResponseDTO(
+                        extra.getName(),
+                        extra.getCpf(),
+                        extra.getRg(),
+                        extra.getPis(),
+                        extra.getDateBirth(),
+                        extra.getEmail(),
+                        extra.getTelefone(),
+                        extra.getESocial(),
+                        extra.getSefip(),
+                        extra.getSindicate(),
+                        extra.isAvailable()
+                ))
+                .collect(Collectors.toList());
     }
+
 
     public ExtraResponseDTO addExtra(ExtraRequestDTO dto){
         Extra extra = new Extra();
@@ -30,7 +50,7 @@ public class Extraservices {
         extra.setRg(dto.rg());
         extra.setPis(dto.pis());
         extra.setESocial(dto.esocial());
-        extra.setSefip(dto.Sefip());
+        extra.setSefip(dto.sefip());
         extra.setSindicate(dto.sindicate());
         extra.setDateBirth(dto.date_birth());
         extra.setTelefone(dto.telefone());
@@ -54,7 +74,7 @@ public class Extraservices {
 
     }
 
-    public void DeleteByid(UUID id){
+    public void deleteById(UUID id){
         if(!repository.existsById(id)){
             throw new RuntimeException("Usuario não encontrado");
         }
@@ -69,7 +89,7 @@ public class Extraservices {
         extra.setEmail(dto.email());
         extra.setRg(dto.rg());
         extra.setPis(dto.pis());
-        extra.setSefip(dto.Sefip());
+        extra.setSefip(dto.sefip());
         extra.setESocial(dto.esocial());
         extra.setTelefone(dto.telefone());
         extra.setSindicate(dto.sindicate());

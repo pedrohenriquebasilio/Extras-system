@@ -16,7 +16,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "extras")
+@Table(name = "extra")
 @Entity
 
 public class Extra {
@@ -31,8 +31,9 @@ public class Extra {
     private Date dateBirth;
     private String email;
     private String Telefone;
+    @Column(name = "esocial")
     private String eSocial;
-    private String Sefip;
+    private String sefip;
     private String Sindicate;
     private boolean isAvailable;
     @ManyToMany(mappedBy = "extras")
