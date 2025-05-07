@@ -1,108 +1,121 @@
-package com.ourominas.freelancers.services.eventservice;
+package com.ourominas.freelancers.service;
 
 import com.ourominas.freelancers.domain.Event;
 import com.ourominas.freelancers.domain.Extra;
-import com.ourominas.freelancers.domain.Users;
-import com.ourominas.freelancers.domain.dto.request.EventRequestDTO;
-import com.ourominas.freelancers.domain.dto.response.EventResponseDTO;
 import com.ourominas.freelancers.repositories.EventRepository;
-import com.ourominas.freelancers.services.extraservices.Extraservices;
-import com.ourominas.freelancers.services.userservices.UserService;
+import com.ourominas.freelancers.repositories.ExtraRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.WeekFields;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class EventService {
 
-
-    private EventRepository eventRepository;
-
     @Autowired
-    private  final Extraservices extraservices;
-
+    private final EventRepository eventRepository;
     @Autowired
-    private  final UserService userService;
+    private final ExtraRepository extraRepository;
 
-    public EventService(EventRepository eventRepository, Extraservices extraservices, UserService userService) {
-        this.eventRepository = eventRepository;
-        this.extraservices = extraservices;
-        this.userService = userService;
+    // ----- CRUD básico -----
+
+    public List<Event> listarEventos() {
+        return eventRepository.findAll();
     }
 
-    public EventResponseDTO criar(EventRequestDTO request) {
-        // Valida campos não nulos
-        if (Objects.isNull(request.extraId()) ||
-                Objects.isNull(request.usuarioId()) ||
-                Objects.isNull(request.nome()) ||
-                Objects.isNull(request.dataInicio()) ||
-                Objects.isNull(request.dataFim()) ||
-                Objects.isNull(request.funcao()) ||
-                Objects.isNull(request.preco())) {
-            throw new IllegalArgumentException("Campos obrigatórios não podem ser nulos.");
+    public Event buscarEventoPorId(UUID eventId) {
+        return eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Evento não encontrado"));
+    }
+
+    public Event criarEvento(Event evento) {
+        return eventRepository.save(evento);
+    }
+
+    public Event atualizarEvento(UUID eventId, Event eventoAtualizado) {
+        Event existente = buscarEventoPorId(eventId);
+
+        existente.setTitle(eventoAtualizado.getTitle());
+        existente.setDescription(eventoAtualizado.getDescription());
+        existente.setDate(eventoAtualizado.getDate());
+
+        return eventRepository.save(existente);
+    }
+
+    public void deletarEvento(UUID eventId) {
+        Event existente = buscarEventoPorId(eventId);
+        eventRepository.delete(existente);
+    }
+
+    // ----- Adicionar Extra com validação -----
+
+    @Transactional
+    public void adicionarExtraNoEvento(UUID eventId, UUID extraId) {
+        Event evento = buscarEventoPorId(eventId);
+        Extra extra = extraRepository.findById(extraId)
+                .orElseThrow(() -> new RuntimeException("Extra não encontrado"));
+
+        if (!podeTrabalharNaSemana(extra, evento.getDate())) {
+            extra.setAvailable(false);
+            extraRepository.save(extra);
+            throw new RuntimeException("Este extra já trabalhou 2 vezes nesta semana");
         }
-        verificaLimiteSemanal(request.extraId(), request.dataInicio());
 
+        evento.getExtras().add(extra);
+        eventRepository.save(evento);
 
-
-        // Valida limite de 2x por semana
-        LocalDateTime dataInicio = request.dataInicio();
-        WeekFields weekFields = WeekFields.of(Locale.getDefault());
-        LocalDateTime inicioSemana = dataInicio.with(weekFields.dayOfWeek(), 1).withHour(0).withMinute(0).withSecond(0);
-        LocalDateTime fimSemana = inicioSemana.plusDays(6).withHour(23).withMinute(59).withSecond(59);
-
-
-
-
-        // Cria entidade Event
-        Event event = new Event();
-        event.setExtra(new Extra(request.extraId()));
-        event.setUsuario(new Users(request.usuarioId()));
-        event.setNome(request.nome());
-        event.setDataInicio(request.dataInicio());
-        event.setDataFim(request.dataFim());
-        event.setLocal(request.local());
-        event.setDescricao(request.descricao());
-        event.setFuncao(request.funcao());
-        event.setPreco(request.preco());
-
-        // Salva no banco
-        Event salvo = eventRepository.save(event);
-
-        // Retorna DTO de resposta
-        return new EventResponseDTO(
-                salvo.getId(),
-                salvo.getExtra().getId(),
-                salvo.getUsuario().getId(),
-                salvo.getNome(),
-                salvo.getDataInicio(),
-                salvo.getDataFim(),
-                salvo.getLocal(),
-                salvo.getDescricao(),
-                salvo.getFuncao(),
-                salvo.getPreco(),
-                salvo.getAtivo(),
-                salvo.getCriadoEm(),
-                salvo.getAtualizadoEm()
-        );
+        atualizarDisponibilidade(extra);
     }
 
-    private void verificaLimiteSemanal(UUID extraId, LocalDateTime dataInicio) {
-        WeekFields weekFields = WeekFields.of(Locale.getDefault());
-        LocalDateTime inicioSemana = dataInicio.with(weekFields.dayOfWeek(), 1)
-                .withHour(0).withMinute(0).withSecond(0);
-        LocalDateTime fimSemana = inicioSemana.plusDays(6)
-                .withHour(23).withMinute(59).withSecond(59);
+    // ----- Remover Extra do Evento -----
 
-        long trabalhosNaSemana = eventRepository.countByExtraIdAndDataInicioBetween(extraId, inicioSemana, fimSemana);
+    @Transactional
+    public void removerExtraDoEvento(UUID eventId, UUID extraId) {
+        Event evento = buscarEventoPorId(eventId);
+        Extra extra = extraRepository.findById(extraId)
+                .orElseThrow(() -> new RuntimeException("Extra não encontrado"));
 
-        if (trabalhosNaSemana >= 2) {
-            throw new IllegalStateException("Extra já tem 2 trabalhos nesta semana.");
-        }
+        evento.getExtras().remove(extra);
+        eventRepository.save(evento);
+
+        atualizarDisponibilidade(extra);
     }
 
+    // ----- Regras de negócio -----
+
+    private boolean podeTrabalharNaSemana(Extra extra, Date dataEvento) {
+        LocalDate dataEventoLocal = converterParaLocalDate(dataEvento);
+        int semanaDoAnoEvento = getSemanaDoAno(dataEventoLocal);
+        int anoEvento = dataEventoLocal.getYear();
+
+        long count = extra.getEvents().stream()
+                .filter(e -> {
+                    LocalDate data = converterParaLocalDate(e.getDate());
+                    return getSemanaDoAno(data) == semanaDoAnoEvento
+                            && data.getYear() == anoEvento;
+                })
+                .count();
+
+        return count < 2;
+    }
+
+    private void atualizarDisponibilidade(Extra extra) {
+        long totalEventos = extra.getEvents().size();
+        extra.setAvailable(totalEventos < 2);
+        extraRepository.save(extra);
+    }
+
+    private LocalDate converterParaLocalDate(Date date) {
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+
+    private int getSemanaDoAno(LocalDate date) {
+        return date.get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear());
+    }
 }
