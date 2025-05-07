@@ -4,6 +4,7 @@ CREATE TABLE extra (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     cpf VARCHAR(255) NOT NULL,
+    rg VARCHAR(255) NOT NULL,
     pis VARCHAR(255) NOT NULL,
     date_birth DATE NOT NULL,
     email VARCHAR(100) NOT NULL,
