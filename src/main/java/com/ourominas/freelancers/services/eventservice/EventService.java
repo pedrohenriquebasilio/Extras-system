@@ -4,6 +4,10 @@ import com.ourominas.freelancers.domain.Event;
 import com.ourominas.freelancers.domain.Extra;
 import com.ourominas.freelancers.domain.dto.request.EventRequestDTO;
 import com.ourominas.freelancers.domain.dto.response.EventResponseDTO;
+import com.ourominas.freelancers.infrastructure.exceptions.EventNotFoundException;
+import com.ourominas.freelancers.infrastructure.exceptions.ExtraNaoDisponivelException;
+import com.ourominas.freelancers.infrastructure.exceptions.ExtraNotFoundException;
+import com.ourominas.freelancers.infrastructure.exceptions.GlobalExceptionHandler;
 import com.ourominas.freelancers.repositories.EventRepository;
 import com.ourominas.freelancers.repositories.ExtraRepository;
 import jakarta.transaction.Transactional;
@@ -23,10 +27,12 @@ public class EventService {
 
     @Autowired
     private final EventRepository eventRepository;
+
     @Autowired
     private final ExtraRepository extraRepository;
 
-    // ----- CRUD básico -----
+    @Autowired
+    private GlobalExceptionHandler exceptionHandler;
 
     public List<Event> listarEventos() {
         return eventRepository.findAll();
@@ -34,25 +40,23 @@ public class EventService {
 
     public Event buscarEventoPorId(UUID eventId) {
         return eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Evento não encontrado"));
+                .orElseThrow(() -> new EventNotFoundException("Evento não encontrado com ID: " + eventId));
     }
 
     public EventResponseDTO criarEvento(EventRequestDTO dto) {
-       Event event = new Event();
+        Event event = new Event();
+        event.setTitle(dto.title());
+        event.setDate(dto.date());
+        event.setDescription(dto.description());
 
-       event.setTitle(dto.title());
-       event.setDate(dto.date());
-       event.setDescription(dto.description());
-
-
-       Event saveEvent = eventRepository.save(event);
-       return new EventResponseDTO(
-               saveEvent.getId(),
-               saveEvent.getTitle(),
-               saveEvent.getDate(),
-               saveEvent.getDescription(),
-               LocalDateTime.now()
-       );
+        Event saveEvent = eventRepository.save(event);
+        return new EventResponseDTO(
+                saveEvent.getId(),
+                saveEvent.getTitle(),
+                saveEvent.getDate(),
+                saveEvent.getDescription(),
+                LocalDateTime.now()
+        );
     }
 
     public Event atualizarEvento(UUID eventId, Event eventoAtualizado) {
@@ -74,12 +78,12 @@ public class EventService {
     public void adicionarExtraNoEvento(UUID eventId, UUID extraId) {
         Event evento = buscarEventoPorId(eventId);
         Extra extra = extraRepository.findById(extraId)
-                .orElseThrow(() -> new RuntimeException("Extra não encontrado"));
+                .orElseThrow(() -> new ExtraNotFoundException("Extra não encontrado com ID: " + extraId));
 
         if (!podeTrabalharNaSemana(extra, evento.getDate())) {
             extra.setAvailable(false);
             extraRepository.save(extra);
-            throw new RuntimeException("Este extra já trabalhou 2 vezes nesta semana");
+            throw new ExtraNaoDisponivelException("Este extra já trabalhou 2 vezes nesta semana");
         }
 
         evento.getExtras().add(extra);
@@ -88,19 +92,17 @@ public class EventService {
         atualizarDisponibilidade(extra);
     }
 
-
     @Transactional
     public void removerExtraDoEvento(UUID eventId, UUID extraId) {
         Event evento = buscarEventoPorId(eventId);
         Extra extra = extraRepository.findById(extraId)
-                .orElseThrow(() -> new RuntimeException("Extra não encontrado"));
+                .orElseThrow(() -> new ExtraNotFoundException("Extra não encontrado com ID: " + extraId));
 
         evento.getExtras().remove(extra);
         eventRepository.save(evento);
 
         atualizarDisponibilidade(extra);
     }
-
 
     private boolean podeTrabalharNaSemana(Extra extra, Date dataEvento) {
         LocalDate dataEventoLocal = converterParaLocalDate(dataEvento);
@@ -110,8 +112,7 @@ public class EventService {
         long count = extra.getEvents().stream()
                 .filter(e -> {
                     LocalDate data = converterParaLocalDate(e.getDate());
-                    return getSemanaDoAno(data) == semanaDoAnoEvento
-                            && data.getYear() == anoEvento;
+                    return getSemanaDoAno(data) == semanaDoAnoEvento && data.getYear() == anoEvento;
                 })
                 .count();
 
