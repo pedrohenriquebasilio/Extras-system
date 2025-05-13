@@ -1,7 +1,9 @@
-package com.ourominas.freelancers.service;
+package com.ourominas.freelancers.services.eventservice;
 
 import com.ourominas.freelancers.domain.Event;
 import com.ourominas.freelancers.domain.Extra;
+import com.ourominas.freelancers.domain.dto.request.EventRequestDTO;
+import com.ourominas.freelancers.domain.dto.response.EventResponseDTO;
 import com.ourominas.freelancers.repositories.EventRepository;
 import com.ourominas.freelancers.repositories.ExtraRepository;
 import jakarta.transaction.Transactional;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.WeekFields;
 import java.util.*;
@@ -34,8 +37,22 @@ public class EventService {
                 .orElseThrow(() -> new RuntimeException("Evento não encontrado"));
     }
 
-    public Event criarEvento(Event evento) {
-        return eventRepository.save(evento);
+    public EventResponseDTO criarEvento(EventRequestDTO dto) {
+       Event event = new Event();
+
+       event.setTitle(dto.nome());
+       event.setDate(dto.date());
+       event.setDescription(dto.description());
+
+
+       Event saveEvent = eventRepository.save(event);
+       return new EventResponseDTO(
+
+               saveEvent.getTitle(),
+               saveEvent.getDate(),
+               saveEvent.getDescription(),
+               LocalDateTime.now()
+       );
     }
 
     public Event atualizarEvento(UUID eventId, Event eventoAtualizado) {
@@ -52,8 +69,6 @@ public class EventService {
         Event existente = buscarEventoPorId(eventId);
         eventRepository.delete(existente);
     }
-
-    // ----- Adicionar Extra com validação -----
 
     @Transactional
     public void adicionarExtraNoEvento(UUID eventId, UUID extraId) {
@@ -73,7 +88,6 @@ public class EventService {
         atualizarDisponibilidade(extra);
     }
 
-    // ----- Remover Extra do Evento -----
 
     @Transactional
     public void removerExtraDoEvento(UUID eventId, UUID extraId) {
@@ -87,7 +101,6 @@ public class EventService {
         atualizarDisponibilidade(extra);
     }
 
-    // ----- Regras de negócio -----
 
     private boolean podeTrabalharNaSemana(Extra extra, Date dataEvento) {
         LocalDate dataEventoLocal = converterParaLocalDate(dataEvento);

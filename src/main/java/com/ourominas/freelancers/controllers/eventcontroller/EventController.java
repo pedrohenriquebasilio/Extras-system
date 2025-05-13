@@ -1,11 +1,19 @@
 package com.ourominas.freelancers.controllers.eventcontroller;
 
 import com.ourominas.freelancers.domain.Event;
-import com.ourominas.freelancers.service.EventService;
+import com.ourominas.freelancers.domain.dto.request.EventRequestDTO;
+import com.ourominas.freelancers.domain.dto.response.EventResponseDTO;
+import com.ourominas.freelancers.domain.dto.response.ExtraResponseDTO;
+
+import com.ourominas.freelancers.services.eventReportService.EventReportService;
+import com.ourominas.freelancers.services.eventservice.EventService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,6 +23,9 @@ import java.util.UUID;
 public class EventController {
 
     private final EventService eventService;
+
+    @Autowired
+    private EventReportService eventReportService;
 
 
     @GetMapping
@@ -28,8 +39,9 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity<Event> criarEvento(@RequestBody Event evento) {
-        return ResponseEntity.ok(eventService.criarEvento(evento));
+    public ResponseEntity<EventResponseDTO> criarEvento(@RequestBody EventRequestDTO requestDTO) {
+        EventResponseDTO createdEvent = eventService.criarEvento(requestDTO);
+        return ResponseEntity.ok(createdEvent);
     }
 
     @PutMapping("/{id}")
@@ -56,4 +68,11 @@ public class EventController {
         eventService.removerExtraDoEvento(eventId, extraId);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/gerar-relatorio")
+    public ResponseEntity<String> gerarRelatorio(@RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
+        eventReportService.gerarRelatorioPresencaDiaria(data);
+        return ResponseEntity.ok("Relatório gerado com sucesso!");
+    }
+
 }
