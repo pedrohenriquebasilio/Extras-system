@@ -22,7 +22,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class EventController {
 
-    private final EventService eventService;
+    @Autowired
+    private  EventService eventService;
 
     @Autowired
     private EventReportService eventReportService;

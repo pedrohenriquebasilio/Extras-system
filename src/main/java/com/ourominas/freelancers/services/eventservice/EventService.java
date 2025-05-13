@@ -40,14 +40,14 @@ public class EventService {
     public EventResponseDTO criarEvento(EventRequestDTO dto) {
        Event event = new Event();
 
-       event.setTitle(dto.nome());
+       event.setTitle(dto.title());
        event.setDate(dto.date());
        event.setDescription(dto.description());
 
 
        Event saveEvent = eventRepository.save(event);
        return new EventResponseDTO(
-
+               saveEvent.getId(),
                saveEvent.getTitle(),
                saveEvent.getDate(),
                saveEvent.getDescription(),

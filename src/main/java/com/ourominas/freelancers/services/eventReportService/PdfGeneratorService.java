@@ -3,12 +3,15 @@ package com.ourominas.freelancers.services.eventReportService;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.ourominas.freelancers.domain.Event;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -19,7 +22,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 
-
+@Getter
+@Setter
 @Service
 public class PdfGeneratorService {
 
@@ -38,22 +42,32 @@ public class PdfGeneratorService {
             Document document = new Document(pdfDoc);
 
 
-            document.add(new Paragraph("Relatório de Presença - " + data.toString())
+            document.add(new Paragraph("Relatório de Presença DIARIO -" + data.toString())
                     .setFontSize(16)
                     .setBold()
                     .setTextAlignment(TextAlignment.CENTER)
                     .setMarginBottom(20));
 
 
-            Table tabela = new Table(UnitValue.createPercentArray(new float[]{3, 7}))
+            Table tabela = new Table(UnitValue.createPercentArray(new float[]{3, 5, 4}))
                     .useAllAvailableWidth();
 
-            tabela.addHeaderCell("ID");
             tabela.addHeaderCell("Título");
+            tabela.addHeaderCell("Descricao");
+            tabela.addHeaderCell("freelancers");
 
             for (Event evento : eventos) {
-                tabela.addCell(evento.getId().toString());
-                tabela.addCell(evento.getTitle());
+                if (evento.getExtras().isEmpty()) {
+                    tabela.addCell(evento.getTitle());
+                    tabela.addCell(evento.getDescription());
+                    tabela.addCell("Sem freelancers");
+                } else {
+                    evento.getExtras().forEach(extra -> {
+                        tabela.addCell(evento.getTitle());
+                        tabela.addCell(evento.getDescription());
+                        tabela.addCell(extra.getName());
+                    });
+                }
             }
 
             document.add(tabela);

@@ -26,6 +26,7 @@ public class Extraservices {
         return repository.findAll()
                 .stream()
                 .map(extra -> new ExtraResponseDTO(
+                        extra.getId(),
                         extra.getName(),
                         extra.getCpf(),
                         extra.getRg(),
@@ -59,6 +60,7 @@ public class Extraservices {
         Extra saveExtra = repository.save(extra);
 
         return new ExtraResponseDTO(
+                saveExtra.getId(),
                 saveExtra.getName(),
                 saveExtra.getCpf(),
                 saveExtra.getRg(),
@@ -99,6 +101,7 @@ public class Extraservices {
         Extra salvo = repository.save(extra);
 
         return new ExtraResponseDTO(
+                salvo.getId(),
                 salvo.getName(),
                 salvo.getCpf(),
                 salvo.getRg(),

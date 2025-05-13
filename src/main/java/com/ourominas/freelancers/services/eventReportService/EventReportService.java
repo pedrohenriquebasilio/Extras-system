@@ -27,8 +27,8 @@ public class EventReportService {
         LocalDateTime startOfDay = data.atStartOfDay();
         LocalDateTime endOfDay = data.atTime(LocalTime.MAX);
 
-        Date startDate = Date.from(startOfDay.atZone(ZoneId.systemDefault()).toInstant());
-        Date endDate = Date.from(endOfDay.atZone(ZoneId.systemDefault()).toInstant());
+        Date startDate = Date.from(startOfDay.atZone(ZoneId.of("UTC")).toInstant());
+        Date endDate = Date.from(endOfDay.atZone(ZoneId.of("UTC")).toInstant());
 
         List<Event> eventosDoDia = eventRepository.findByDateBetween(startDate, endDate);
 
