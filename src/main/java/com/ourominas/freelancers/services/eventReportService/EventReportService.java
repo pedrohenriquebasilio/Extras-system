@@ -6,6 +6,7 @@ import com.ourominas.freelancers.repositories.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -22,7 +23,7 @@ public class EventReportService {
     @Autowired
     private PdfGeneratorService pdfGeneratorService;
 
-    public void gerarRelatorioPresencaDiaria(LocalDate data) {
+    public Path gerarRelatorioPresencaDiaria(LocalDate data) {
 
         LocalDateTime startOfDay = data.atStartOfDay();
         LocalDateTime endOfDay = data.atTime(LocalTime.MAX);
@@ -36,6 +37,6 @@ public class EventReportService {
             throw new RuntimeException("Nenhum evento encontrado para o dia: " + data);
         }
 
-        pdfGeneratorService.gerarPdf(eventosDoDia, data); // ainda vamos implementar
+        return pdfGeneratorService.gerarPdf(eventosDoDia, data);
     }
 }

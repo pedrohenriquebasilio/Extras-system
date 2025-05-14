@@ -27,27 +27,23 @@ import java.util.List;
 @Service
 public class PdfGeneratorService {
 
-    public void gerarPdf(List<Event> eventos, LocalDate data) {
+    public Path gerarPdf(List<Event> eventos, LocalDate data) {
         String pastaDestino = "C:\\relatorios";
-        String nomeArquivo = String.format("presenca-%s.pdf", data.toString());
+        String nomeArquivo = String.format("presenca-%s.pdf", data);
         Path caminho = Paths.get(pastaDestino, nomeArquivo);
 
         try {
-
             Files.createDirectories(caminho.getParent());
-
 
             PdfWriter writer = new PdfWriter(caminho.toString());
             PdfDocument pdfDoc = new PdfDocument(writer);
             Document document = new Document(pdfDoc);
 
-
-            document.add(new Paragraph("Relatório de Presença DIARIO -" + data.toString())
+            document.add(new Paragraph("Relatório de Presença DIARIO -" + data)
                     .setFontSize(16)
                     .setBold()
                     .setTextAlignment(TextAlignment.CENTER)
                     .setMarginBottom(20));
-
 
             Table tabela = new Table(UnitValue.createPercentArray(new float[]{3, 5, 4}))
                     .useAllAvailableWidth();
@@ -73,7 +69,8 @@ public class PdfGeneratorService {
             document.add(tabela);
             document.close();
 
-            System.out.println("PDF gerado em: " + caminho);
+            return caminho;
+
         } catch (IOException e) {
             throw new RuntimeException("Erro ao gerar PDF", e);
         }

@@ -12,5 +12,7 @@ public record EventRequestDTO(
         UUID usuarioId,
         String title,
         Date date,
+        LocalDateTime StartDate,
+        LocalDateTime endDate,
         String description
 ) {}

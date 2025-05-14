@@ -48,12 +48,16 @@ public class EventService {
         event.setTitle(dto.title());
         event.setDate(dto.date());
         event.setDescription(dto.description());
+        event.setStartDate(dto.StartDate());
+        event.setEndDate(dto.endDate());
 
         Event saveEvent = eventRepository.save(event);
         return new EventResponseDTO(
                 saveEvent.getId(),
                 saveEvent.getTitle(),
                 saveEvent.getDate(),
+                saveEvent.getStartDate(),
+                saveEvent.getEndDate(),
                 saveEvent.getDescription(),
                 LocalDateTime.now()
         );
@@ -65,6 +69,8 @@ public class EventService {
         existente.setTitle(eventoAtualizado.getTitle());
         existente.setDescription(eventoAtualizado.getDescription());
         existente.setDate(eventoAtualizado.getDate());
+        existente.setStartDate(eventoAtualizado.getStartDate());
+        existente.setEndDate(eventoAtualizado.getEndDate());
 
         return eventRepository.save(existente);
     }

@@ -9,6 +9,8 @@ public record EventResponseDTO(
         UUID id,
         String nome,
         Date date,
+        LocalDateTime StartDate,
+        LocalDateTime endDate,
         String description,
         LocalDateTime criadoEm
 ) {}

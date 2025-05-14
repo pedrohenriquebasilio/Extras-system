@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -31,6 +32,10 @@ public class Event {
     private String description;
 
     private Date date;
+
+    private LocalDateTime StartDate;
+
+    private LocalDateTime EndDate;
 
     @ManyToMany
     @JoinTable(

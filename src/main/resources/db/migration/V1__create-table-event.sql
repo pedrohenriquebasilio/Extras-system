@@ -4,5 +4,7 @@ CREATE TABLE event (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    date TIMESTAMP NOT NULL
+    date TIMESTAMP NOT NULL,
+    StartDate TIMESTAMP NOT NULL,
+    EndDate TIMESTAMP NOT NULL
 );
