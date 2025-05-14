@@ -45,22 +45,25 @@ public class PdfGeneratorService {
                     .setTextAlignment(TextAlignment.CENTER)
                     .setMarginBottom(20));
 
-            Table tabela = new Table(UnitValue.createPercentArray(new float[]{3, 5, 4}))
+            Table tabela = new Table(UnitValue.createPercentArray(new float[]{3, 4, 5, 5}))
                     .useAllAvailableWidth();
 
             tabela.addHeaderCell("Título");
-            tabela.addHeaderCell("Descricao");
             tabela.addHeaderCell("freelancers");
+            tabela.addHeaderCell("Horario inicio");
+            tabela.addHeaderCell("Horario termino");
 
             for (Event evento : eventos) {
                 if (evento.getExtras().isEmpty()) {
                     tabela.addCell(evento.getTitle());
-                    tabela.addCell(evento.getDescription());
+                    tabela.addCell(String.valueOf(evento.getStartDate()));
+                    tabela.addCell(String.valueOf(evento.getEndDate()));
                     tabela.addCell("Sem freelancers");
                 } else {
                     evento.getExtras().forEach(extra -> {
                         tabela.addCell(evento.getTitle());
-                        tabela.addCell(evento.getDescription());
+                        tabela.addCell(String.valueOf(evento.getStartDate()));
+                        tabela.addCell(String.valueOf(evento.getEndDate()));
                         tabela.addCell(extra.getName());
                     });
                 }
