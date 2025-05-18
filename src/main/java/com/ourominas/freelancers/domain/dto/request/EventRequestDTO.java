@@ -10,7 +10,9 @@ import java.util.UUID;
 
 public record EventRequestDTO(
         UUID usuarioId,
-        String nome,
+        String title,
         Date date,
+        LocalDateTime StartDate,
+        LocalDateTime endDate,
         String description
 ) {}

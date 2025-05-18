@@ -1,15 +1,11 @@
 package com.ourominas.freelancers.services.extraservices;
 
-
 import com.ourominas.freelancers.domain.Extra;
-import com.ourominas.freelancers.domain.Users;
 import com.ourominas.freelancers.domain.dto.request.ExtraRequestDTO;
-import com.ourominas.freelancers.domain.dto.request.UserRequestDTO;
 import com.ourominas.freelancers.domain.dto.response.ExtraResponseDTO;
-import com.ourominas.freelancers.domain.dto.response.UserResponseDTO;
+import com.ourominas.freelancers.infrastructure.exceptions.ExtraNotFoundException;
 import com.ourominas.freelancers.repositories.ExtraRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +22,7 @@ public class Extraservices {
         return repository.findAll()
                 .stream()
                 .map(extra -> new ExtraResponseDTO(
+                        extra.getId(),
                         extra.getName(),
                         extra.getCpf(),
                         extra.getRg(),
@@ -41,10 +38,8 @@ public class Extraservices {
                 .collect(Collectors.toList());
     }
 
-
-    public ExtraResponseDTO addExtra(ExtraRequestDTO dto){
+    public ExtraResponseDTO addExtra(ExtraRequestDTO dto) {
         Extra extra = new Extra();
-
         extra.setName(dto.name());
         extra.setEmail(dto.email());
         extra.setRg(dto.rg());
@@ -59,31 +54,31 @@ public class Extraservices {
         Extra saveExtra = repository.save(extra);
 
         return new ExtraResponseDTO(
+                saveExtra.getId(),
                 saveExtra.getName(),
                 saveExtra.getCpf(),
                 saveExtra.getRg(),
                 saveExtra.getPis(),
                 saveExtra.getDateBirth(),
-                saveExtra.getESocial(),
                 saveExtra.getEmail(),
+                saveExtra.getTelefone(),
+                saveExtra.getESocial(),
                 saveExtra.getSefip(),
                 saveExtra.getSindicate(),
-                saveExtra.getTelefone(),
                 saveExtra.isAvailable()
         );
-
     }
 
-    public void deleteById(UUID id){
-        if(!repository.existsById(id)){
-            throw new RuntimeException("Usuario não encontrado");
+    public void deleteById(UUID id) {
+        if (!repository.existsById(id)) {
+            throw new ExtraNotFoundException("Extra não encontrado com ID: " + id);
         }
         repository.deleteById(id);
     }
 
     public ExtraResponseDTO atualizarUsuario(UUID id, ExtraRequestDTO dto) {
         Extra extra = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new ExtraNotFoundException("Extra não encontrado com ID: " + id));
 
         extra.setName(dto.name());
         extra.setEmail(dto.email());
@@ -95,10 +90,10 @@ public class Extraservices {
         extra.setSindicate(dto.sindicate());
         extra.setDateBirth(dto.date_birth());
 
-
         Extra salvo = repository.save(extra);
 
         return new ExtraResponseDTO(
+                salvo.getId(),
                 salvo.getName(),
                 salvo.getCpf(),
                 salvo.getRg(),
@@ -112,7 +107,4 @@ public class Extraservices {
                 salvo.isAvailable()
         );
     }
-
-
-
 }

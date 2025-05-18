@@ -10,9 +10,12 @@ import com.ourominas.freelancers.services.eventservice.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -22,7 +25,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class EventController {
 
-    private final EventService eventService;
+    @Autowired
+    private  EventService eventService;
 
     @Autowired
     private EventReportService eventReportService;
@@ -70,9 +74,16 @@ public class EventController {
     }
 
     @GetMapping("/gerar-relatorio")
-    public ResponseEntity<String> gerarRelatorio(@RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
-        eventReportService.gerarRelatorioPresencaDiaria(data);
-        return ResponseEntity.ok("Relatório gerado com sucesso!");
+    public ResponseEntity<byte[]> gerarRelatorio(@RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) throws IOException {
+        Path caminhoPdf = eventReportService.gerarRelatorioPresencaDiaria(data);
+
+        byte[] pdfBytes = Files.readAllBytes(caminhoPdf);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(ContentDisposition.attachment().filename(caminhoPdf.getFileName().toString()).build());
+
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }
 
 }
