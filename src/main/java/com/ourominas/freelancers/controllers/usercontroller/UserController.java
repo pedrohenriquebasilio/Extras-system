@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
+@RequestMapping("users")
 @Controller
 public class UserController {
 
