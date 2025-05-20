@@ -33,8 +33,10 @@ public class Event {
 
     private Date date;
 
+    @Column(name = "start_date")
     private LocalDateTime StartDate;
 
+    @Column(name = "end_date")
     private LocalDateTime EndDate;
 
     @ManyToMany

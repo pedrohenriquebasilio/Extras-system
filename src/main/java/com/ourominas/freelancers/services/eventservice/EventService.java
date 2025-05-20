@@ -51,6 +51,9 @@ public class EventService {
         event.setStartDate(dto.StartDate());
         event.setEndDate(dto.endDate());
 
+        List<Extra> extras = extraRepository.findAllById(dto.extraId());
+        event.setExtras(new HashSet<>(extras));
+
         Event saveEvent = eventRepository.save(event);
         return new EventResponseDTO(
                 saveEvent.getId(),
