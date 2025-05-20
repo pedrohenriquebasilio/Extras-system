@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,6 +46,14 @@ public class UserController {
         UserResponseDTO atualizado = userService.atualizarUsuario(id, dto);
         return ResponseEntity.ok(atualizado);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Users> buscaUserporId(@PathVariable UUID id) {
+        return ResponseEntity.ok(userService.buscarExtraPorId(id));
+    }
+
+
+
 
 
 }

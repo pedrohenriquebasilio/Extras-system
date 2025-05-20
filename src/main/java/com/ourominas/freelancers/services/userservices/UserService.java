@@ -1,9 +1,11 @@
 package com.ourominas.freelancers.services.userservices;
 
 
+import com.ourominas.freelancers.domain.Extra;
 import com.ourominas.freelancers.domain.Users;
 import com.ourominas.freelancers.domain.dto.request.UserRequestDTO;
 import com.ourominas.freelancers.domain.dto.response.UserResponseDTO;
+import com.ourominas.freelancers.infrastructure.exceptions.EventNotFoundException;
 import com.ourominas.freelancers.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -84,6 +86,13 @@ public class UserService {
         );
 
     }
+
+    public Users buscarExtraPorId(UUID extraid) {
+        return repository.findById(extraid)
+                .orElseThrow(() -> new EventNotFoundException("Evento não encontrado com ID: " + extraid));
+    }
+
+
 
 
 
