@@ -17,6 +17,10 @@ public class UserService {
     @Autowired
     private UserRepository repository;
 
+    public Users getUserById(UUID id){
+        return repository.findById(id).orElse(null);
+    }
+
     public List<Users> getAllUsers(){
         return repository.findAll();
     }

@@ -5,6 +5,7 @@ import com.ourominas.freelancers.domain.Users;
 import com.ourominas.freelancers.domain.dto.request.UserRequestDTO;
 import com.ourominas.freelancers.domain.dto.response.UserResponseDTO;
 import com.ourominas.freelancers.services.userservices.UserService;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,11 @@ public class UserController {
         return userService.getAllUsers();
     }
 
+    @GetMapping("/usuarios/{id}")
+    public ResponseEntity<Users> get(@PathVariable UUID id) {
+        return ResponseEntity.ok(userService.getUserById(id));
+    }
+
     @PostMapping("/cadastra-user")
     public ResponseEntity addUser(@RequestBody UserRequestDTO userRequestDTO){
         userService.addUsers(userRequestDTO);
@@ -47,6 +53,4 @@ public class UserController {
         UserResponseDTO atualizado = userService.atualizarUsuario(id, dto);
         return ResponseEntity.ok(atualizado);
     }
-
-
 }

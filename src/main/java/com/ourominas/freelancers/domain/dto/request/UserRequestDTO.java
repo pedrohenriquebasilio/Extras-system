@@ -1,4 +1,6 @@
 package com.ourominas.freelancers.domain.dto.request;
 
-public record UserRequestDTO(Long id, String name, String email, String password, String department, String role) {
+import java.util.UUID;
+
+public record UserRequestDTO(UUID id, String name, String email, String password, String department, String role) {
 }
