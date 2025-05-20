@@ -3,6 +3,7 @@ package com.ourominas.freelancers.services.extraservices;
 import com.ourominas.freelancers.domain.Extra;
 import com.ourominas.freelancers.domain.dto.request.ExtraRequestDTO;
 import com.ourominas.freelancers.domain.dto.response.ExtraResponseDTO;
+import com.ourominas.freelancers.infrastructure.exceptions.EventNotFoundException;
 import com.ourominas.freelancers.infrastructure.exceptions.ExtraNotFoundException;
 import com.ourominas.freelancers.repositories.ExtraRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,5 +107,10 @@ public class Extraservices {
                 salvo.getSindicate(),
                 salvo.isAvailable()
         );
+    }
+
+    public Extra buscaExtraporId(UUID extraid) {
+        return repository.findById(extraid)
+                .orElseThrow(() -> new EventNotFoundException("Evento não encontrado com ID: " + extraid));
     }
 }
