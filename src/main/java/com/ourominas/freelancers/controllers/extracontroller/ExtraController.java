@@ -1,5 +1,6 @@
 package com.ourominas.freelancers.controllers.extracontroller;
 
+import com.ourominas.freelancers.domain.Extra;
 import com.ourominas.freelancers.domain.dto.request.ExtraRequestDTO;
 import com.ourominas.freelancers.domain.dto.response.ExtraResponseDTO;
 import com.ourominas.freelancers.services.extraservices.Extraservices;
@@ -8,9 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -53,8 +52,8 @@ public class ExtraController {
         ExtraResponseDTO updatedExtra = extraservices.atualizarUsuario(id, dto);
         return ResponseEntity.ok(updatedExtra);
     }
-
-
-
-
+    @GetMapping("/{id}")
+    public ResponseEntity<Extra> buscarExtraPorId(@PathVariable UUID id) {
+        return ResponseEntity.ok(extraservices.buscaExtraporId(id));
+    }
 }
