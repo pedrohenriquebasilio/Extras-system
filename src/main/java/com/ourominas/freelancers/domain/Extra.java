@@ -1,5 +1,6 @@
 package com.ourominas.freelancers.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.ourominas.freelancers.domain.Event;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -37,5 +38,6 @@ public class Extra {
     private String Sindicate;
     private boolean isAvailable;
     @ManyToMany(mappedBy = "extras")
+    @JsonBackReference
     private Set<Event> events = new HashSet<>();
 }

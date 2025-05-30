@@ -43,6 +43,7 @@ public class Event {
             joinColumns = @JoinColumn(name = "event_id"),
             inverseJoinColumns = @JoinColumn(name = "extra_id")
     )
+    @JsonManagedReference
     private Set<Extra> extras = new HashSet<>();
 
 }
